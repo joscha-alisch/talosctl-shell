@@ -1,0 +1,47 @@
+name: Check Latest Talosctl Version
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # hourly
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest Talosctl release tag
+        id: get_latest
+        run: |
+          tag=$(curl -s https://api.github.com/repos/siderolabs/talos/releases/latest | jq -r .tag_name)
+          echo "Latest Talosctl tag: $tag"
+          echo "latest_tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Check if image tag already exists in GHCR
+        id: check_ghcr
+        env:
+          GHCR_USER: joscha-alisch
+          GHCR_REPO: talosctl-shell
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+        run: |
+          latest_tag="${{ steps.get_latest.outputs.latest_tag }}"
+          tags=$(curl -s -u "$GHCR_USER:$GHCR_PAT" \
+            https://ghcr.io/v2/${GHCR_USER}/${GHCR_REPO}/tags/list \
+            | jq -r '.tags[]')
+
+          if echo "$tags" | grep -q "^$latest_tag$"; then
+            echo "Image with tag $latest_tag already exists."
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          else
+            echo "Tag $latest_tag not found. Will trigger build."
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger build workflow
+        if: steps.check_ghcr.outputs.should_build == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-image.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: |
+            talosctl_version: ${{ steps.get_latest.outputs.latest_tag }}
+            latest: true
