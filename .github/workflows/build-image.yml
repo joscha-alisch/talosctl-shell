@@ -1,5 +1,5 @@
-name: Build and Publish Image
-
+name: Build and Publish Image 
+run-name: Build talosctl ${{ inputs.talosctl_version }}
 on:
   workflow_dispatch:
     inputs:
