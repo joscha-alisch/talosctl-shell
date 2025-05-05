@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: .
-          tags: ghcr.io/<your-username>/talosctl-extended:${{ github.event.inputs.talosctl_version }}
+          tags: ghcr.io/joscha-alisch/talosctl:${{ github.event.inputs.talosctl_version }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -55,6 +55,6 @@ jobs:
             TALOSCTL_VERSION=${{ github.event.inputs.talosctl_version }}
       - name: Sign the published Docker image
         env:
-          tags: ghcr.io/<your-username>/talosctl-extended:${{ github.event.inputs.talosctl_version }}
+          tags: ghcr.io/joscha-alisch/talosctl:${{ github.event.inputs.talosctl_version }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
