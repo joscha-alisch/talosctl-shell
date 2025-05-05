@@ -2,7 +2,7 @@ name: Check Latest Talosctl Version
 
 on:
   schedule:
-    - cron: '0 * * * *'  # hourly
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
