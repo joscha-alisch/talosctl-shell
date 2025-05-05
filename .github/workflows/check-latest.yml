@@ -23,7 +23,7 @@ jobs:
         id: check_ghcr
         env:
           GHCR_USER: joscha-alisch
-          GHCR_REPO: talosctl-shell
+          GHCR_REPO: talosctl
           GHCR_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_tag="${{ steps.get_latest.outputs.latest_tag }}"
@@ -33,7 +33,7 @@ jobs:
           if [ -z "$response" ] || ! echo "$response" | jq -e .tags > /dev/null; then
             echo "Failed to fetch tags or no tags found in the response:"
             echo "$response"
-            echo "should_build=false" >> $GITHUB_OUTPUT
+            exit 1
           else
             tags=$(echo "$response" | jq -r '.tags[]')
             if echo "$tags" | grep -q "^$latest_tag$"; then
