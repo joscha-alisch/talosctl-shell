@@ -48,5 +48,4 @@ jobs:
         with:
           workflow: build-image.yml
           token: ${{ secrets.GITHUB_TOKEN }}
-          inputs: |
-            talosctl_version: ${{ steps.get_latest.outputs.latest_tag }}
+          inputs: '{ "talosctl_version": "${{ steps.get_latest.outputs.latest_tag }}", "latest": true }'
