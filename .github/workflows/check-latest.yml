@@ -23,7 +23,7 @@ jobs:
         id: check_ghcr
         env:
           GHCR_USER: joscha-alisch
-          GHCR_REPO: talosctl-shell
+          GHCR_REPO: talosctl
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
         run: |
           latest_tag="${{ steps.get_latest.outputs.latest_tag }}"
